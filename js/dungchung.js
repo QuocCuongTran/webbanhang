@@ -158,16 +158,22 @@ function setCurrentUser(u) {
 
 // Hàm get set cho danh sách người dùng
 function getListUser() {
-    var data = JSON.parse(window.localStorage.getItem('ListUser')) || []
-    var l = [];
-    for (var d of data) {
-        l.push(d);
-    }
-    return l;
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "fetch_users.php", true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            const users = JSON.parse(xhr.responseText);
+            return users; // Now we get the user data from the database
+        }
+    };
+    xhr.send();
 }
 
-function setListUser(l) {
-    window.localStorage.setItem('ListUser', JSON.stringify(l));
+function setListUser(newUser) {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "save_user.php", true); // Assume save_user.php handles saving the user to Oracle
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.send("username=" + newUser.username + "&password=" + newUser.password + "&email=" + newUser.email);
 }
 
 // Sau khi chỉnh sửa 1 user 'u' thì cần hàm này để cập nhật lại vào ListUser
@@ -857,6 +863,16 @@ function getThongTinSanPhamFrom_TheGioiDiDong() {
 			})();`;
         document.body.appendChild(s);
     })();
+}
+function loadUserData() {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "fetch_users.php", true); // Call the PHP script
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            document.getElementById("userData").innerHTML = xhr.responseText; // Update HTML with user data
+        }
+    };
+    xhr.send();
 }
 
 // $('.taikhoan').find('input').on('keyup blur focus', function (e) {
